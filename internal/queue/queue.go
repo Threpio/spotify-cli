@@ -35,7 +35,7 @@ func NewCommand() *cobra.Command {
 }
 
 func Queue(api internal.APIInterface, query string) (string, error) {
-	track, err := internal.Search(api, query)
+	track, err := internal.Search(api,"tracks", query)
 	if err != nil {
 		return "", err
 	}

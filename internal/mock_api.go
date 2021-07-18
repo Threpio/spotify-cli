@@ -10,7 +10,7 @@ type APIInterface interface {
 	RemoveSavedTracks(ids ...string) error
 
 	GetPlayback() (*spotify.Playback, error)
-	Play(deviceID string, uris ...string) error
+	Play(deviceID, contextURI string, uris ...string) error
 	Pause(deviceID string) error
 	SkipToNextTrack() error
 	SkipToPreviousTrack() error
@@ -18,7 +18,7 @@ type APIInterface interface {
 	Shuffle(state bool) error
 	Queue(uri string) error
 
-	Search(q string, limit int) (*spotify.Paging, error)
+	Search(q, searchType string, limit int) (*spotify.Paging, error)
 }
 
 type MockAPI struct {
@@ -48,8 +48,8 @@ func (m *MockAPI) GetPlayback() (*spotify.Playback, error) {
 	return playback.(*spotify.Playback), err
 }
 
-func (m *MockAPI) Play(deviceID string, uris ...string) error {
-	args := m.Called(deviceID, uris)
+func (m *MockAPI) Play(deviceID, contextURI string, uris ...string) error {
+	args := m.Called(deviceID, contextURI, uris)
 	return args.Error(0)
 }
 

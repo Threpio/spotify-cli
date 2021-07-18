@@ -2,11 +2,11 @@ package play
 
 import (
 	"errors"
+	"github.com/brianstrauch/spotify"
 	"spotify/internal"
 	"spotify/internal/status"
 	"strings"
 
-	"github.com/brianstrauch/spotify"
 	"github.com/spf13/cobra"
 )
 
@@ -26,8 +26,12 @@ func NewCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			playlistQuery, err := cmd.Flags().GetString("playlist")
+			if err != nil {
+				return err
+			}
 
-			status, err := Play(api, query, deviceID)
+			status, err := Play(api, query, playlistQuery, deviceID)
 			if err != nil {
 				return err
 			}
@@ -38,11 +42,12 @@ func NewCommand() *cobra.Command {
 	}
 
 	cmd.Flags().String("device-id", "", "Device ID from 'spotify device list'.")
+	cmd.Flags().String("playlist", "", "Playlist name from 'spotify playlist list'")
 
 	return cmd
 }
 
-func Play(api internal.APIInterface, query, deviceID string) (string, error) {
+func Play(api internal.APIInterface, query, contextQuery, deviceID string) (string, error) {
 	playback, err := api.GetPlayback()
 	if err != nil {
 		return "", err
@@ -53,16 +58,16 @@ func Play(api internal.APIInterface, query, deviceID string) (string, error) {
 	}
 
 	if len(query) > 0 {
-		track, err := internal.Search(api, query)
+		track, err := internal.Search(api,"tracks", query)
 		if err != nil {
 			return "", err
 		}
 
-		if err := api.Play(deviceID, track.URI); err != nil {
+		if err := api.Play(deviceID,contextQuery, track.URI); err != nil {
 			return "", err
 		}
 	} else {
-		if err := api.Play(deviceID); err != nil {
+		if err := api.Play(deviceID,"",""); err != nil {
 			return "", err
 		}
 	}
