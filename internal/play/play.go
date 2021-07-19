@@ -58,15 +58,35 @@ func Play(api internal.APIInterface, query, contextQuery, deviceID string) (stri
 	}
 
 	if len(query) > 0 {
-		track, err := internal.Search(api,"tracks", query)
+		track, err := internal.Search(api,"track", query)
 		if err != nil {
 			return "", err
 		}
 
-		if err := api.Play(deviceID,contextQuery, track.URI); err != nil {
+		if err := api.Play(deviceID, contextQuery, track.URI); err != nil {
 			return "", err
 		}
-	} else {
+	} else if len(contextQuery) > 0 {
+
+		// Return a different API interface required for the playlist commands?
+		api, err := internal.Authenticate()
+		if err != nil {
+			return "", err
+		}
+
+		playlists, err := api.GetPlaylists()
+		if err != nil {
+			return "", err
+		}
+
+		for _, playlist := range playlists {
+			if strings.EqualFold(playlist.Name, contextQuery) {
+				if err := api.Play(deviceID, playlist.URI); err != nil {
+					return "", err
+				}
+			}
+		}
+	}else {
 		if err := api.Play(deviceID,"",""); err != nil {
 			return "", err
 		}
