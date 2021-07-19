@@ -58,7 +58,7 @@ func Play(api internal.APIInterface, query, contextQuery, deviceID string) (stri
 	}
 
 	if len(query) > 0 {
-		track, err := internal.Search(api,"track", query)
+		track, err := internal.Search(api, "track", query)
 		if err != nil {
 			return "", err
 		}
@@ -86,8 +86,8 @@ func Play(api internal.APIInterface, query, contextQuery, deviceID string) (stri
 				}
 			}
 		}
-	}else {
-		if err := api.Play(deviceID,"",""); err != nil {
+	} else {
+		if err := api.Play(deviceID, "", ""); err != nil {
 			return "", err
 		}
 	}
